@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 25.8.3.2 (Windows)"/>
+	<meta name="created" content="2026-02-23T04:14:27.755952200"/>
+	<meta name="changed" content="2026-02-23T04:26:30.673813500"/>
+</head>
+<body lang="ja-JP" dir="ltr"><h1 style="margin-top: 0cm"><font face="Liberation Sans, sans-serif"><span lang="en-US">Trust
+&amp; Accuracy Contract v0.1</span></font></h1>
+<h3 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">for
+UEH Observer Infrastructure</span></font></h3>
+<h2 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">0.
+</span></font>目的（<font face="Liberation Serif, serif"><span lang="en-US">Purpose</span></font>）</h2>
+<p>本システムは<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font><strong>実行・最適化・助言を行わない観測インフラ</strong>である。</p>
+<p>したがって精度の定義は<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>「予測の正しさ」ではなく、</p>
+<blockquote><strong>観測状態の正確性・鮮度・整合性の保証</strong></blockquote>
+<p>に基づく。</p>
+<p>本契約は、<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>表示される全ての数値が<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>「どの程度信頼可能か」を明示するための基盤仕様である。</p>
+<hr/>
+
+<h1 style="margin-top: 0cm"><font face="Liberation Sans, sans-serif"><span lang="en-US">1.
+</span></font>精度の正式定義（<font face="Liberation Sans, sans-serif"><span lang="en-US">Accuracy
+Definition</span></font>）</h1>
+<p>本インフラにおける「精度」は以下の<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">4</span></font></font>要素で構成される。</p>
+<h2 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">1.1
+Correctness</span></font>（正確性）</h2>
+<ul>
+	<li><p>プロトコルのオンチェーン状態と一致した値であること</p></li>
+	<li><p>推定値ではなく、取得値を優先する</p></li>
+</ul>
+<p>対象：</p>
+<ul>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Health
+	Factor</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Collateral</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Debt</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Liquidation
+	Threshold</span></font></font></p></li>
+</ul>
+<hr/>
+
+<h2 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">1.2
+Freshness</span></font>（鮮度）</h2>
+<p>表示データは以下を必ず紐付ける：</p>
+<ul>
+	<li><p>観測ブロック番号</p></li>
+	<li><p>最終更新時刻</p></li>
+	<li><p>データ遅延（<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Lag</span></font></font>）</p></li>
+</ul>
+<p>例：</p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Block:
+19283746</span></font></font></p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Lag:
+0 blocks</span></font></font></p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Last
+Update: 14s ago</span></font></font></p>
+<p>鮮度は「高速掲示板の信頼性」の核心とする。</p>
+<hr/>
+
+<h2 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">1.3
+Consistency</span></font>（整合性）</h2>
+<p>単一ソースの値を盲信しない。<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>最低<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">2</span></font></font>系統の観測経路で整合性を検証する。</p>
+<p>推奨：</p>
+<ul>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Primary
+	RPC</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Secondary
+	RPC / Indexer</span></font></font>（将来）</p></li>
+</ul>
+<p>整合条件：</p>
+<ul>
+	<li><p>ブロック差が閾値以内</p></li>
+	<li><p>主要指標の乖離が許容範囲内</p></li>
+</ul>
+<hr/>
+
+<h2 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">1.4
+Provenance</span></font>（出所透明性）</h2>
+<p>すべての表示はデータ出所を明示可能であること。</p>
+<p>最低表示項目：</p>
+<ul>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Chain</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Protocol</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Data
+	Source</span></font></font>（<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">RPC/Provider</span></font></font>）</p></li>
+</ul>
+<hr/>
+
+<h1 style="margin-top: 0cm"><font face="Liberation Sans, sans-serif"><span lang="en-US">2.
+</span></font>信頼メタデータ表示仕様（<font face="Liberation Sans, sans-serif"><span lang="en-US">Board
+Metadata</span></font>）</h1>
+<p>電光掲示板型<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">CLI</span></font></font>において、<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>以下のメタ情報は必須表示とする。</p>
+<h3 style="margin-top: 0cm; margin-bottom: 0.5cm">必須メタ項目（<font face="Liberation Serif, serif"><span lang="en-US">MVP</span></font>）</h3>
+<ul>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Data
+	Block</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Lag</span></font></font>（<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">blocks
+	or seconds</span></font></font>）</p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Source
+	Status</span></font></font>（<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">OK
+	/ Degraded / Refusal</span></font></font>）</p></li>
+</ul>
+<p>例（標準表示）：</p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">HF:
+1.21</span></font></font></p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">LiqDist:
+8.3%</span></font></font></p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Block:
+19283746 (lag 0)</span></font></font></p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Source:
+primary(ok) / secondary(ok)</span></font></font></p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Status:
+Stable</span></font></font></p>
+<h1 style="margin-top: 0cm"><font face="Liberation Sans, sans-serif"><span lang="en-US">3.
+Refusal Protocol</span></font>（拒否プロトコル）※<font face="Liberation Sans, sans-serif"><span lang="en-US">UEH</span></font>核心</h1>
+<h2 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">3.1
+Refusal</span></font>の原則</h2>
+<p>不確実な状態での断定表示は禁止する。<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>信頼性が保証できない場合、<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>システムは「表示を拒否」または「劣化表示」に移行する。</p>
+<p>これは障害ではなく、<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font><strong>信頼保護機構</strong>である。</p>
+<hr/>
+
+<h2 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">3.2
+Refusal</span></font>発動条件（<font face="Liberation Serif, serif"><span lang="en-US">MVP</span></font>基準）</h2>
+<h3 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">A.
+</span></font>データ整合性異常</h3>
+<ul>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Primary/Secondary</span></font></font>のブロック差
+	<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">&gt;
+	</span></font></font>設定閾値</p></li>
+	<li><p>指標乖離 <font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">&gt;
+	</span></font></font>許容範囲</p></li>
+</ul>
+<p>表示：</p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Status:
+REFUSAL (inconsistent data sources)</span></font></font></p>
+<hr/>
+
+<h3 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">B.
+RPC</span></font>不安定 <font face="Liberation Serif, serif"><span lang="en-US">/
+</span></font>タイムアウト</h3>
+<ul>
+	<li><p>応答遅延 <font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">&gt;
+	</span></font></font>設定秒数</p></li>
+	<li><p>連続取得失敗</p></li>
+</ul>
+<p>表示：</p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Status:
+DEGRADED (data source unstable)</span></font></font></p>
+<hr/>
+
+<h3 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">C.
+</span></font>境界付近での不確実性</h3>
+<p>（例：<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">HF</span></font></font>が清算境界近傍）</p>
+<p>条件例：</p>
+<ul>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">HF
+	&lt; 1.30 </span></font></font>かつデータ遅延あり</p></li>
+</ul>
+<p>表示：</p>
+<p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Status:
+Boundary (verification strict mode)</span></font></font></p>
+<hr/>
+
+<h1 style="margin-top: 0cm"><font face="Liberation Sans, sans-serif"><span lang="en-US">4.
+Boundary-Aware Accuracy</span></font>（境界適応型精度）</h1>
+<h2 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">4.1
+</span></font>通常状態（<font face="Liberation Serif, serif"><span lang="en-US">Normal
+Zone</span></font>）</h2>
+<ul>
+	<li><p>標準更新間隔（例：<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">15–30</span></font></font>秒）</p></li>
+	<li><p>軽量検証</p></li>
+</ul>
+<hr/>
+
+<h2 style="margin-top: 0cm; margin-bottom: 0.5cm"><font face="Liberation Serif, serif"><span lang="en-US">4.2
+</span></font>境界接近状態（<font face="Liberation Serif, serif"><span lang="en-US">Boundary
+Zone</span></font>）</h2>
+<p>条件例：</p>
+<ul>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Health
+	Factor &lt; 1.3</span></font></font></p></li>
+</ul>
+<p>挙動：</p>
+<ul>
+	<li><p>更新頻度向上</p></li>
+	<li><p>二重検証強化</p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Refusal</span></font></font>閾値を厳格化</p></li>
+</ul>
+<p>これは「高速道路の事故掲示板」に相当する緊急精度モードである。</p>
+<hr/>
+
+<h1 style="margin-top: 0cm"><font face="Liberation Sans, sans-serif"><span lang="en-US">5.
+</span></font>更新モデル（<font face="Liberation Sans, sans-serif"><span lang="en-US">Board
+Update Model</span></font>）</h1>
+<p>本システムは<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font><strong>定周期観測型（<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Periodic
+Observer Model</span></font></font>）</strong> を採用する。</p>
+<p>初期推奨：</p>
+<ul>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">15</span></font></font>秒更新（<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">MVP</span></font></font>）</p></li>
+	<li><p>非リアルタイム誤認を避けるため<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>「<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Last
+	Update</span></font></font>」を明示表示する</p></li>
+</ul>
+<p>理由：<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>過剰リアルタイム表示は<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>誤精度のリスクを増大させるため。</p>
+<hr/>
+
+<h1 style="margin-top: 0cm"><font face="Liberation Sans, sans-serif"><span lang="en-US">6.
+</span></font>非助言保証（<font face="Liberation Sans, sans-serif"><span lang="en-US">Non-Advisory
+Integrity Clause</span></font>）</h1>
+<p>本インフラは以下を絶対に行わない：</p>
+<ul>
+	<li><p>投資助言</p></li>
+	<li><p>最適行動提案</p></li>
+	<li><p>自動実行</p></li>
+	<li><p>リスクスコアによる行動誘導</p></li>
+</ul>
+<p>表示は常に：</p>
+<blockquote>状態・境界・観測値のみ</blockquote>
+<p>とする。</p>
+<hr/>
+
+<h1 style="margin-top: 0cm"><font face="Liberation Sans, sans-serif"><span lang="en-US">7.
+</span></font>エラーハンドリング哲学（<font face="Liberation Sans, sans-serif"><span lang="en-US">Survivability</span></font>）</h1>
+<p>優先順位：</p>
+<ol>
+	<li><p>正確な表示</p></li>
+	<li><p>劣化表示（<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Degraded</span></font></font>）</p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Refusal</span></font></font>（表示拒否）</p></li>
+	<li><p>沈黙（最終手段）</p></li>
+</ol>
+<p>誤った断定表示は<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>最も重大な信頼侵害と定義する。</p>
+<hr/>
+
+<h1 style="margin-top: 0cm"><font face="Liberation Sans, sans-serif"><span lang="en-US">8.
+MVP</span></font>適用スコープ（初期固定）</h1>
+<ul>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Chain:
+	Ethereum</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Protocol:
+	Aave v3</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Mode:
+	CLI Board (Live Observer)</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Access:
+	Read-only / Non-custodial</span></font></font></p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Input:
+	Wallet Address</span></font></font>のみ</p></li>
+</ul>
+<hr/>
+
+<h1 style="margin-top: 0cm"><font face="Liberation Sans, sans-serif"><span lang="en-US">9.
+</span></font>設計思想との整合宣言（<font face="Liberation Sans, sans-serif"><span lang="en-US">UEH
+Alignment</span></font>）</h1>
+<p>本契約は以下の思想と一致する：</p>
+<ul>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Boundary</span></font></font>（境界可視化）</p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Refusal</span></font></font>（拒否による安全性）</p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Survivability</span></font></font>（誤動作回避）</p></li>
+	<li><p><font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US">Observer</span></font></font>（非介入観測）</p></li>
+</ul>
+<p>したがって本システムは：</p>
+<blockquote>「便利ツール」ではなく<font face="Liberation Serif, serif"><font size="3" style="font-size: 12pt"><span lang="en-US"><br/>
+</span></font></font>「信頼可能な観測インフラ層」である。</blockquote>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+<p><br/>
+<br/>
+
+</p>
+</body>
+</html>
