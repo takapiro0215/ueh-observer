@@ -1,8 +1,16 @@
 def get_aave_account_data(wallet_address: str) -> dict:
-    if wallet_address.lower() == "0x1111111111111111111111111111111111111111":
+    wallet = wallet_address.lower()
+
+    if wallet == "0x1111111111111111111111111111111111111111":
         health_factor = 1.25
         collateral_usd = 12000.0
         debt_usd = 8000.0
+
+    elif wallet == "0x3333333333333333333333333333333333333333":
+        health_factor = 1.10
+        collateral_usd = 10000.0
+        debt_usd = 9000.0
+
     else:
         health_factor = 1.75
         collateral_usd = 15000.0
