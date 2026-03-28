@@ -80,7 +80,7 @@ Liq Distance: N/A
 Collateral Base: 11802351761.0
 Debt Base: 0.0
 
-Note: collateral/debt values are Aave base units, not direct USD.
+Note: Base values are raw Aave reference units. Estimated USD values are provisional and should be treated as reference only.
 
 Block: 24733342
 Lag: 0
@@ -124,7 +124,6 @@ Full Specification (DOCX)
 
 ## Verification Status
 
-- NO_POSITION state: verified using zero-address and empty wallets
-- Borrow-position state: pending
-
-Borrow-position state verification remains pending until a reproducible Aave v3 wallet with active debt is prepared.
+- NO_POSITION state: verified
+- STABLE state: verified with a reproducible Aave v3 borrow position
+- Borrow-position verification: in progress for WATCH / BOUNDARY_APPROACHING
