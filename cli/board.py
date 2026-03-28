@@ -34,7 +34,7 @@ def main():
         if result.get("error_message"):
             print(f"Error: {result['error_message']}")
         print()
-        
+
     elif result["status"] == "NO_POSITION":
         print("HF: N/A")
         print("Liq Distance: N/A")
@@ -42,7 +42,13 @@ def main():
         print(f"Collateral Base: {result['collateral_base']}")
         print(f"Debt Base: {result['debt_base']}")
         print()
-        print("Note: collateral/debt values are Aave base units, not direct USD.")
+        print(f"Collateral (est USD): {result['collateral_est_usd']}")
+        print(f"Debt (est USD): {result['debt_est_usd']}")
+        print()
+        print(
+            "Note: base values are raw Aave reference units. "
+            "Estimated USD values are provisional and should be treated as reference only."
+        )
         print()
 
     else:
@@ -52,7 +58,13 @@ def main():
         print(f"Collateral Base: {result['collateral_base']}")
         print(f"Debt Base: {result['debt_base']}")
         print()
-        print("Note: collateral/debt values are Aave base units, not direct USD.")
+        print(f"Collateral (est USD): {result['collateral_est_usd']}")
+        print(f"Debt (est USD): {result['debt_est_usd']}")
+        print()
+        print(
+            "Note: base values are raw Aave reference units. "
+            "Estimated USD values are provisional and should be treated as reference only."
+        )
         print()
 
     print(f"Block: {result['block_number']}")

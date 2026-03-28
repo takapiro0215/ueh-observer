@@ -10,6 +10,12 @@ def observe_wallet(wallet_address: str) -> dict:
     debt = data.get("debt_base", 0)
     collateral = data.get("collateral_base", 0)
 
+    # Phase 1:
+    # estimated USD is currently aligned with Aave base reference values.
+    # This is provisional and intentionally labeled as estimate only.
+    collateral_est_usd = collateral
+    debt_est_usd = debt
+
     if primary != "ok" and secondary != "ok":
         return {
             "status": "REFUSAL",
@@ -19,10 +25,13 @@ def observe_wallet(wallet_address: str) -> dict:
             "liq_distance_pct": None,
             "collateral_base": None,
             "debt_base": None,
+            "collateral_est_usd": None,
+            "debt_est_usd": None,
             "block_number": data.get("block_number"),
             "lag_blocks": data.get("lag_blocks"),
             "primary_source": primary,
             "secondary_source": secondary,
+            "error_message": data.get("error_message"),
         }
 
     if debt == 0:
@@ -34,10 +43,13 @@ def observe_wallet(wallet_address: str) -> dict:
             "liq_distance_pct": None,
             "collateral_base": collateral,
             "debt_base": debt,
+            "collateral_est_usd": collateral_est_usd,
+            "debt_est_usd": debt_est_usd,
             "block_number": data.get("block_number"),
             "lag_blocks": data.get("lag_blocks"),
             "primary_source": primary,
             "secondary_source": secondary,
+            "error_message": data.get("error_message"),
         }
 
     if primary != "ok" or secondary != "ok":
@@ -64,10 +76,13 @@ def observe_wallet(wallet_address: str) -> dict:
         "liq_distance_pct": liq_distance,
         "collateral_base": collateral,
         "debt_base": debt,
+        "collateral_est_usd": collateral_est_usd,
+        "debt_est_usd": debt_est_usd,
         "block_number": data.get("block_number"),
         "lag_blocks": data.get("lag_blocks"),
         "primary_source": primary,
         "secondary_source": secondary,
+        "error_message": data.get("error_message"),
     }
 
 
