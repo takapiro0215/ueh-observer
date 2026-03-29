@@ -17,6 +17,11 @@ class ValueLayer(str, Enum):
     DERIVED = "DERIVED"
     ESTIMATED = "ESTIMATED"
 
+class StateOrigin(str, Enum):
+    NONE = "NONE"
+    OBSERVED = "OBSERVED"
+    MARKET = "MARKET"
+    SYSTEM = "SYSTEM"
 
 def _build_observed(value: Any, trust: TrustLevel, layer: ValueLayer, reason: Optional[str] = None) -> dict:
     return {
@@ -172,6 +177,56 @@ def _compute_status(no_position: dict, health_factor: dict) -> dict:
         layer=ValueLayer.DERIVED,
     )
 
+def _compute_state_origin(status: dict) -> dict:
+    status_value = status.get("value")
+    status_trust = status.get("trust")
+
+    if status_trust == TrustLevel.REFUSED.value:
+        return _build_observed(
+            value=StateOrigin.SYSTEM.value,
+            trust=TrustLevel.REFUSED,
+            layer=ValueLayer.DERIVED,
+            reason="state origin unavailable because status is refused",
+        )
+
+    if status_trust == TrustLevel.DEGRADED.value:
+        return _build_observed(
+            value=StateOrigin.SYSTEM.value,
+            trust=TrustLevel.DEGRADED,
+            layer=ValueLayer.DERIVED,
+            reason="state origin degraded because status is degraded",
+        )
+
+    if status_value == "NO_POSITION":
+        return _build_observed(
+            value=StateOrigin.NONE.value,
+            trust=TrustLevel.CONSISTENT,
+            layer=ValueLayer.DERIVED,
+            reason="no active borrow position",
+        )
+
+    if status_value == "STABLE":
+        return _build_observed(
+            value=StateOrigin.OBSERVED.value,
+            trust=TrustLevel.CONSISTENT,
+            layer=ValueLayer.DERIVED,
+            reason="state is observed but direct transition path is not asserted",
+        )
+
+    if status_value in {"WATCH", "BOUNDARY_APPROACHING"}:
+        return _build_observed(
+            value=StateOrigin.MARKET.value,
+            trust=TrustLevel.CONSISTENT,
+            layer=ValueLayer.DERIVED,
+            reason="boundary-near state is interpreted as market-driven",
+        )
+
+    return _build_observed(
+        value=StateOrigin.SYSTEM.value,
+        trust=TrustLevel.DEGRADED,
+        layer=ValueLayer.DERIVED,
+        reason="unknown status for state origin",
+    )
 
 def _compute_liq_distance_pct(health_factor: dict, no_position: dict) -> dict:
     no_pos_value = no_position.get("value")
@@ -274,6 +329,7 @@ def observe_wallet(wallet_address: str) -> dict:
 
     no_position = _compute_no_position(collateral_base, debt_base)
     status = _compute_status(no_position, health_factor)
+    state_origin = _compute_state_origin(status)
 
     if no_position.get("value") is True:
         display_health_factor = _build_observed(
@@ -313,9 +369,11 @@ def observe_wallet(wallet_address: str) -> dict:
         "debt_base": debt_base["value"],
         "collateral_est_usd": collateral_est_usd["value"],
         "debt_est_usd": debt_est_usd["value"],
+        "state_origin": state_origin["value"],
 
         # Additional derived flat field
         "no_position": no_position["value"],
+        "state_origin": state_origin["value"],
 
         # Trust / layer maps for board and future UI
         "trust_map": {
@@ -327,9 +385,12 @@ def observe_wallet(wallet_address: str) -> dict:
             "collateral_est_usd": collateral_est_usd["trust"],
             "debt_est_usd": debt_est_usd["trust"],
             "no_position": no_position["trust"],
+            "state_origin": state_origin["trust"],
         },
+        
         "layer_map": {
             "status": status["layer"],
+            "state_origin": state_origin["layer"],
             "health_factor": display_health_factor["layer"],
             "liq_distance_pct": liq_distance_pct["layer"],
             "collateral_base": collateral_base["layer"],
@@ -338,6 +399,7 @@ def observe_wallet(wallet_address: str) -> dict:
             "debt_est_usd": debt_est_usd["layer"],
             "no_position": no_position["layer"],
         },
+
         "trust_reason_map": {
             "status": status["reason"],
             "health_factor": display_health_factor["reason"],
@@ -347,6 +409,7 @@ def observe_wallet(wallet_address: str) -> dict:
             "collateral_est_usd": collateral_est_usd["reason"],
             "debt_est_usd": debt_est_usd["reason"],
             "no_position": no_position["reason"],
+            "state_origin": state_origin["reason"],            
         },
 
         # Optional nested detail for future use
@@ -361,6 +424,7 @@ def observe_wallet(wallet_address: str) -> dict:
                 "health_factor": display_health_factor,
                 "liq_distance_pct": liq_distance_pct,
                 "no_position": no_position,
+                "state_origin": state_origin,          
             },
             "estimated": {
                 "collateral_est_usd": collateral_est_usd,

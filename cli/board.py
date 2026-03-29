@@ -13,13 +13,16 @@ def _safe_get(mapping: dict, key: str, default=None):
     return mapping.get(key, default)
 
 
-def _fmt_value(value):
+def _fmt_value(value, field: str = ""):
     if value is None:
         return "N/A"
-    if isinstance(value, float):
-        return f"{value:.2f}"
-    return str(value)
 
+    if isinstance(value, float):
+        if field == "health_factor":
+            return f"{value:.4f}"   # ← ここ重要
+        return f"{value:.2f}"
+
+    return str(value)
 
 def _fmt_percent(value):
     if value is None:
@@ -52,24 +55,37 @@ def _line(label: str, value_text: str, trust_text: str, layer_text: str, reason_
 
 def _render_field(result: dict, label: str, field: str, formatter=None) -> str:
     value = result.get(field)
-    value_text = formatter(value) if formatter else _fmt_value(value)
+
+    if formatter:
+        value_text = formatter(value)
+    else:
+        value_text = _fmt_value(value, field)  # ← field渡す
+
     trust_text = _fmt_trust(result, field)
     layer_text = _fmt_layer(result, field)
     reason_text = _fmt_reason(result, field)
-    return _line(label, value_text, trust_text, layer_text, reason_text)
 
+    return _line(label, value_text, trust_text, layer_text, reason_text)
 
 def _status_note(status: str) -> str:
     notes = {
-        "NO_POSITION": "No active debt position. Observer sees no borrow-based risk state.",
-        "STABLE": "Position is inside the currently observable protocol-safe operating range.",
-        "WATCH": "Near the protocol safety boundary.",
-        "BOUNDARY_APPROACHING": "Approaching liquidation boundary.",
+        "NO_POSITION": "No active debt position. Borrow-based liquidation observation is not applicable.",
+        "STABLE": "Position is currently inside the observable safe operating range.",
+        "WATCH": "Near the protocol safety boundary. This region is interpreted as market-driven.",
+        "BOUNDARY_APPROACHING": "Approaching liquidation boundary. This region is interpreted as market-driven.",
         "DEGRADED": "Observation is degraded due to incomplete source integrity.",
         "REFUSAL": "Observer refused unsafe interpretation due to source failure or inconsistency.",
     }
     return notes.get(status, "")
 
+def _state_origin_note(origin: str) -> str:
+    notes = {
+        "NONE": "No state transition path applies because there is no active borrow position.",
+        "OBSERVED": "State is directly observed, but the transition path is not asserted.",
+        "MARKET": "State is interpreted as reached through post-position market dynamics.",
+        "SYSTEM": "State meaning depends on system/source condition rather than market behavior.",
+    }
+    return notes.get(origin, "")
 
 def main():
     if len(sys.argv) > 1:
@@ -107,6 +123,7 @@ def main():
 
     print("[Derived]")
     print(_render_field(result, "Status", "status"))
+    print(_render_field(result, "State Origin", "state_origin"))
     print(_render_field(result, "Liq Distance", "liq_distance_pct", _fmt_percent))
     print(_render_field(result, "No Position", "no_position"))
     print()
@@ -143,6 +160,12 @@ def main():
     if result.get("error_message"):
         print(f"Error Message: {result['error_message']}")
 
+    state_origin = result.get("state_origin")
+    if isinstance(state_origin, str):
+        origin_note = _state_origin_note(state_origin)
+        if origin_note:
+            print(f"Origin Note: {origin_note}")
+            print()
 
 if __name__ == "__main__":
     main()

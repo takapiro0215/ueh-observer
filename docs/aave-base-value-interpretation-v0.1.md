@@ -54,3 +54,84 @@ The Observer exposes two parallel representations:
 ```text
 collateral_base
 debt_base
+
+・Directly derived from Aave protocol state
+・No transformation applied
+・Considered the highest-trust representation
+
+2. Interpretation Layer (Provisional)
+    collateral_est_usd
+    debt_est_usd
+
+・Currently aligned with base values (no external conversion)
+・Introduced as a structural placeholder for future valuation logic
+・Explicitly marked as provisional
+
+Trust Separation
+
+Layer           Source          Trust Level         Notes
+Base	        Aave protocol	High	            Raw reference values
+Estimated USD	Observer layer	Low	Provisional     interpretation
+
+The two layers must never be conflated.
+
+UI Representation Rules
+
+The CLI board must follow:
+
+1.Display base values first
+2.Display estimated values second
+3.Clearly label estimated values as provisional
+4.Include explanatory note
+
+Example:
+Collateral Base: 11802351761.0
+Debt Base: 0.0
+
+Collateral (est USD): 11802351761.0
+Debt (est USD): 0.0
+
+Note: base values are raw Aave reference units. Estimated USD values are provisional and should be treated as reference only.
+
+Known Limitations
+・Estimated USD values are not true USD conversions
+・No price oracle or external data source is used
+・Base units may vary depending on Aave market configuration
+・Large values (e.g., zero-address) may appear counterintuitive
+
+Future Direction
+The following steps are required before upgrading est USD:
+
+1. Reference Currency Clarification
+
+・Identify Aave base currency definition
+・Confirm scaling and decimals
+
+2. Normalization Layer
+
+・Determine whether base values require scaling adjustment
+・Validate consistency across markets
+
+3. Optional Pricing Integration
+
+・Evaluate using Aave oracle or external price feeds
+・Ensure separation from raw trust layer
+
+4. Trust Upgrade Path
+
+・Define criteria for promoting est USD from provisional to defined interpretation
+・Introduce explicit trust metadata if needed
+
+Key Principle
+
+The Observer does not convert values blindly.
+It exposes the boundary between raw state and interpretation.
+
+Summary
+
+・Aave base values are protocol-normalized reference values
+・They are preserved as the authoritative observation layer
+・Estimated USD values are introduced structurally, not semantically
+・Trust separation is explicit and intentional
+・Future upgrades will not compromise raw state integrity
+・HF = 1.5 represents the protocol-enforced safety boundary.

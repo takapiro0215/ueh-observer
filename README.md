@@ -17,10 +17,10 @@ It only exposes state, boundaries, and trust metadata.
 
 ## Core Philosophy
 
-- Boundary over prediction  
-- Refusal over uncertainty  
-- Observability over automation  
-- Survivability over convenience  
+- Boundary over prediction
+- Refusal over uncertainty
+- Observability over automation
+- Survivability over convenience
 
 ---
 
@@ -28,13 +28,13 @@ It only exposes state, boundaries, and trust metadata.
 
 UEH Observer is not a dashboard.
 
-It is a **meaning layer over protocol state**.
+It is a meaning layer over protocol state.
 
 It separates:
 
-- Raw protocol data  
-- Derived observer meaning  
-- Estimated convenience values  
+- Raw protocol data
+- Derived observer meaning
+- Estimated convenience values
 
 And attaches explicit trust semantics to each.
 
@@ -44,10 +44,9 @@ And attaches explicit trust semantics to each.
 
 The current implementation connects to Aave v3 (Ethereum) and derives observer states from live on-chain data via:
 
-getUserAccountData()
+`getUserAccountData()`
 
-Instead of exposing raw protocol values directly,  
-Observer transforms them into **interpretable state representations**.
+Instead of exposing raw protocol values directly, Observer transforms them into interpretable state representations.
 
 ---
 
@@ -60,8 +59,6 @@ Observer transforms them into **interpretable state representations**.
 - `DEGRADED`
 - `REFUSAL`
 
----
-
 ### NO_POSITION
 Represents absence of borrow positions.
 
@@ -72,42 +69,37 @@ In this state:
 - Health Factor is not meaningful
 - Liquidation Distance is not meaningful
 
----
-
 ### STABLE
 Position is within a protocol-safe operating range.
 
-This state is:
-- reachable via user actions (borrow/supply)
-- maintained under stable conditions
-
----
+This state is directly observable, but Observer does not currently assert whether it was reached by fresh user action or maintained through later market movement.
 
 ### WATCH
-Represents a **low-health region near the protocol safety boundary**.
+Represents a low-health region near the protocol safety boundary.
 
 Important:
 
-- WATCH is **empirically observable**
-- It is typically **not reached directly via borrow actions**
-- It is reached through **market dynamics**, such as:
-  - price movement
-  - interest accrual
+- WATCH is empirically observable
+- Aave may restrict additional borrowing into this region
+- However, an already-open position can move into WATCH through market dynamics
+
+Examples:
+- collateral price movement
+- debt growth
+- interest accrual
 
 Therefore:
 
-> WATCH is a **market-driven reachable state**, not purely user-driven.
-
----
+> WATCH is treated as a market-driven reachable state.
 
 ### BOUNDARY_APPROACHING
-Represents a deeper boundary-near region (lower HF threshold).
+Represents a deeper boundary-near region with lower health factor.
 
-- Semantically valid
-- Not yet fully empirically confirmed in current verification
-- Expected to behave similarly to WATCH under stronger stress
+This state is:
 
----
+- semantically defined
+- expected to be market-driven if observed
+- not yet fully empirically confirmed in current verification
 
 ### DEGRADED
 Observation is possible but data quality is reduced.
@@ -117,8 +109,6 @@ Causes may include:
 - lag inconsistencies
 - missing upstream values
 
----
-
 ### REFUSAL
 Observer intentionally refuses to produce output.
 
@@ -127,7 +117,51 @@ Triggered when:
 - required data is missing
 - interpretation would be unsafe
 
-> Refusal is a design feature, not an error.
+Refusal is a design feature, not an error.
+
+---
+
+## State Origin
+
+Observer distinguishes not only state, but also the semantic origin of that state.
+
+Possible values:
+
+- `NONE`
+- `OBSERVED`
+- `MARKET`
+- `SYSTEM`
+
+### NONE
+No active borrow position exists, so state-transition origin is not applicable.
+
+Typical mapping:
+- `NO_POSITION`
+
+### OBSERVED
+The state is directly observed, but the transition path is not asserted.
+
+Typical mapping:
+- `STABLE`
+
+This is intentionally conservative.
+Observer does not currently claim whether the position was created by immediate user action or remained stable through later market evolution.
+
+### MARKET
+The state is interpreted as reached through post-position market dynamics.
+
+Typical mapping:
+- `WATCH`
+- `BOUNDARY_APPROACHING`
+
+This reflects the current verified understanding that boundary-near states may be observed after position creation due to market movement, rather than direct borrowing into that exact state.
+
+### SYSTEM
+The state meaning depends on source/system condition rather than protocol-market behavior.
+
+Typical mapping:
+- `DEGRADED`
+- `REFUSAL`
 
 ---
 
@@ -135,8 +169,8 @@ Triggered when:
 
 Observer distinguishes between:
 
-- **User-driven transitions** (borrow, repay, supply)
-- **Market-driven transitions** (price, interest)
+- User-constrained protocol transitions
+- Market-driven state evolution
 
 Key principle:
 
@@ -144,8 +178,10 @@ Key principle:
 
 Example:
 
-- User cannot borrow into unsafe HF range
-- But market movement can push HF into WATCH
+- A user may be prevented from borrowing into a lower-HF boundary region
+- But a live position can later drift into that region through market movement
+
+This distinction is important for interpreting `WATCH` and future `BOUNDARY_APPROACHING` observations.
 
 ---
 
@@ -156,37 +192,38 @@ Observer separates data into three layers:
 ### Raw (Protocol)
 Direct values returned from protocol:
 
-- collateral_base  
-- debt_base  
-- health_factor  
+- `collateral_base`
+- `debt_base`
+- `health_factor`
 
 These are:
-- protocol-native units
+- protocol-native values
+- closest to protocol truth
 - not normalized to USD
 
----
-
 ### Derived (Observer Meaning)
+Values computed deterministically from Raw values:
 
-- status  
-- liq_distance_pct  
-- no_position  
+- `status`
+- `state_origin`
+- `liq_distance_pct`
+- `no_position`
 
 These are:
-- deterministic interpretations of Raw values
-- logically consistent transformations
-
----
+- Observer-side interpretations
+- deterministic and explainable
+- dependent on upstream integrity
 
 ### Estimated (Convenience)
+Values computed as convenience approximations:
 
-- collateral_est_usd  
-- debt_est_usd  
+- `collateral_est_usd`
+- `debt_est_usd`
 
 These are:
-- approximations
 - not protocol truth
-- explicitly marked as estimated
+- provisional
+- explicitly labeled as estimated
 
 ---
 
@@ -194,15 +231,17 @@ These are:
 
 Each value is annotated with a trust level:
 
-- `VERIFIED` → directly from protocol  
-- `CONSISTENT` → derived deterministically  
-- `ESTIMATED` → approximation  
-- `DEGRADED` → partially unreliable  
-- `REFUSED` → intentionally not provided  
+- `VERIFIED`   → directly from protocol
+- `CONSISTENT` → deterministically derived
+- `ESTIMATED`  → approximate value
+- `DEGRADED`   → partially unreliable
+- `REFUSED`    → intentionally withheld
 
 Key principle:
 
-> Trust applies to the interpretation path, not just the value.
+> Trust applies to the interpretation path, not only to the value itself.
+
+This prevents Observer from collapsing protocol fact, semantic interpretation, and convenience approximation into a single layer.
 
 ---
 
@@ -212,32 +251,27 @@ The board displays:
 
 - Value
 - Trust level
-- Layer (RAW / DERIVED / ESTIMATED)
+- Layer (`RAW` / `DERIVED` / `ESTIMATED`)
 
 Example:
 
-Health Factor : 1.49 [VERIFIED] (RAW)
-Status : WATCH [CONSISTENT] (DERIVED)
-Liq Distance : 49.15% [CONSISTENT] (DERIVED)
+```text
+Health Factor   : 1.4968      [VERIFIED] (RAW)
+Status          : WATCH       [CONSISTENT] (DERIVED)
+State Origin    : MARKET      [CONSISTENT] (DERIVED)
+Liq Distance    : 49.68%      [CONSISTENT] (DERIVED)
 
+Important Notes
+・Base values are not direct USD values
+・Estimated values are not authoritative
+・Some protocol-returned values may be intentionally suppressed when not meaningful
+・Example: health_factor is not displayed as meaningful in NO_POSITION
 
----
-
-## Important Notes
-
-- Base values are **not USD**
-- Estimated values are **not authoritative**
-- Some protocol-returned values may be **suppressed** if not meaningful (e.g., HF in NO_POSITION)
-
----
-
-## How to Run
-
+How to Run
 From project root:
 
-```bash
-python -m cli.board
-python -m cli.board 0xYourWalletAddressHere
+    python -m cli.board
+    python -m cli.board 0xYourWalletAddressHere
 
 Example Output
 
@@ -248,63 +282,61 @@ Protocol: Aave v3
 Wallet: 0x...
 
 [Raw]
-Collateral Base     : 2394164743.00      [VERIFIED] (RAW)
-Debt Base           : 1332355049.00      [VERIFIED] (RAW)
-Health Factor       : 1.49               [VERIFIED] (RAW)
+Collateral Base     : 2402755968.00      [VERIFIED] (RAW)
+Debt Base           : 1332359448.00      [VERIFIED] (RAW)
+Health Factor       : 1.4968             [VERIFIED] (RAW)
 
 [Derived]
 Status              : WATCH              [CONSISTENT] (DERIVED)
-Liq Distance        : 49.15%             [CONSISTENT] (DERIVED)
+State Origin        : MARKET             [CONSISTENT] (DERIVED)
+Liq Distance        : 49.68%             [CONSISTENT] (DERIVED)
+No Position         : False              [CONSISTENT] (DERIVED)
 
 [Estimated]
-Collateral est USD  : 2394164743.00      [ESTIMATED] (ESTIMATED)
+Collateral est USD  : 2402755968.00      [ESTIMATED] (ESTIMATED)
+Debt est USD        : 1332359448.00      [ESTIMATED] (ESTIMATED)
 
 Design Direction
 
 UEH Observer is not a dashboard.
+
 It is:
 
 ・a semantic layer over protocol state
 ・a boundary-aware observer
 ・a trust-explicit system
+・a state-origin-aware observer model
 
 Future direction includes:
 
 ・Multi-protocol observation
 ・Cross-protocol aggregation
-・Observer as infrastructure layer
+・Observer as reusable infrastructure layer
+・Stronger trust propagation rules
+・Richer boundary verification
 
 Verification Status
 
-・NO_POSITION state: verified
-・STABLE state: verified
-・WATCH state: empirically observed (market-driven transition confirmed)
-・BOUNDARY_APPROACHING: not yet fully verified
+・NO_POSITION: verified
+・STABLE: verified
+・WATCH: empirically observed
+・WATCH as market-driven boundary-near state: interpreted and implemented
+・BOUNDARY_APPROACHING: defined, not yet fully verified
+・REFUSAL / DEGRADED: verified through source-failure handling
 
 Summary
-UEH Observer has reached:
+
+UEH Observer has progressed through the following stages:
 
 Working Observer
 → Meaningful Observer
 → Reality-aligned Observer
 
 Current focus:
-Formalizing trust, boundaries, and meaning across protocol and market behavior
+
+Formalizing trust, state origin, and protocol-boundary meaning across real market behavior.
 
 
 ---
 
-## 今回のREADMEのポイント
-
-今回の更新で特に重要なのはこの3つです：
-
-### ① WATCHの再定義（最重要）
-- 到達可能
-- ただし **市場経由**
-
----
-
-### ② 「遷移 vs 状態」の分離
-```text
-Protocol controls transitions
-Market determines state evolution
+次にやるときれいなのは、`board.py` の **HF表示を4桁化** して、`1.50` 表示なのに `WATCH` になる違和感を消すことです。
