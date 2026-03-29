@@ -99,7 +99,7 @@ Represents a deeper boundary-near region with lower health factor.
 This state is:
 
 - semantically defined
-- not yet fully empirically confirmed
+- not yet empirically observed
 - expected to be primarily market-driven
 
 Important:
@@ -112,8 +112,8 @@ Important:
 
 Therefore:
 
-> BOUNDARY_APPROACHING is treated as a **market-driven boundary state**,  
-> and may be **observable rather than actively reachable**.
+> BOUNDARY_APPROACHING is treated as a market-driven boundary state,
+> and may be observable rather than actively reachable.
 
 This distinction is important for interpreting boundary behavior:
 
@@ -336,49 +336,53 @@ Future direction includes:
 
 ## Verification Status
 
-- `NO_POSITION`: verified  
-- `STABLE`: verified  
-- `WATCH`: empirically observed  
-- `WATCH` as market-driven boundary-near state: confirmed  
-- `BOUNDARY_APPROACHING`: semantically defined, not yet empirically observed  
-- `REFUSAL` / `DEGRADED`: verified through source-failure handling  
+・NO_POSITION: verified
+・STABLE: verified
+・WATCH: empirically observed
+・WATCH as market-driven boundary-near state: confirmed
+・BOUNDARY_APPROACHING: semantically defined, not yet empirically observed
+・REFUSAL / DEGRADED: verified through source-failure handling
+
+Market-Driven Reachability
+
+Observer distinguishes between:
+
+・user-driven reachable states
+・market-driven reachable states
+
+Important observation:
+Not all states defined in the model are directly reachable through user actions.
+
+In particular:
+
+・WATCH may be approached through both user actions and market dynamics
+・BOUNDARY_APPROACHING is expected to be primarily market-driven
+
+Under protocol constraints:
+
+・additional borrowing may be restricted before reaching deeper boundary regions
+・therefore, certain states may only be observed through post-position deterioration
+
+This leads to a key distinction:
+
+・Some states are reachable
+・Some states are observable only
+
+Observer explicitly preserves this distinction.
 
 Summary
-
 UEH Observer has progressed through the following stages:
-
 Working Observer
 → Meaningful Observer
 → Reality-aligned Observer
 
+Current status:
+
+・State model: aligned with protocol behavior
+・Trust model: explicitly defined and propagated
+・State origin: integrated into interpretation
+・Boundary semantics: defined and partially verified
+
 Current focus:
 
-Formalizing trust, state origin, and protocol-boundary meaning across real market behavior.
-
-## Market-Driven Reachability
-
-Observer distinguishes between:
-
-- user-driven reachable states
-- market-driven reachable states
-
-Important observation:
-
-> Not all states defined in the model are directly reachable through user actions.
-
-In particular:
-
-- `WATCH` may be approached through both user actions and market dynamics
-- `BOUNDARY_APPROACHING` is expected to be primarily market-driven
-
-Under protocol constraints:
-
-- additional borrowing may be restricted before reaching deeper boundary regions
-- therefore, certain states may only be observed through post-position deterioration
-
-This leads to a key distinction:
-
-- Some states are **reachable**
-- Some states are **observable only**
-
-Observer explicitly preserves this distinction.
+Formalizing trust, state origin, and boundary meaning under real market conditions.
