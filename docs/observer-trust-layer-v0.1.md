@@ -178,6 +178,18 @@ If `health_factor` becomes DEGRADED:
 
 ---
 
+## Minimum Propagation Rules (v0.1)
+
+Observer currently applies the following minimum rules:
+
+- REFUSED propagates downstream  
+- DEGRADED weakens downstream trust  
+- ESTIMATED never upgrades to VERIFIED  
+
+These rules are intentionally minimal and may be extended in future versions.
+
+---
+
 ### Rules
 
 1. Raw values can be:
@@ -186,9 +198,9 @@ If `health_factor` becomes DEGRADED:
    - REFUSED
 
 2. Derived values:
-   - CONSISTENT if inputs are strong
-   - DEGRADED if any input is degraded
-   - REFUSED if required input is missing
+   - CONSISTENT if required inputs are strong
+   - DEGRADED if any required input is degraded
+   - REFUSED if any required input is missing or refused
 
 3. Estimated values:
    - at best ESTIMATED
