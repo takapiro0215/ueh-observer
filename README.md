@@ -93,13 +93,32 @@ Therefore:
 > WATCH is treated as a market-driven reachable state.
 
 ### BOUNDARY_APPROACHING
+
 Represents a deeper boundary-near region with lower health factor.
 
 This state is:
 
 - semantically defined
-- expected to be market-driven if observed
-- not yet fully empirically confirmed in current verification
+- not yet fully empirically confirmed
+- expected to be primarily market-driven
+
+Important:
+
+- Under current protocol constraints, this state may not be directly reachable through additional borrow actions
+- It is expected to be reached through post-position market dynamics, such as:
+  - collateral price decline
+  - debt growth over time
+  - interest accrual
+
+Therefore:
+
+> BOUNDARY_APPROACHING is treated as a **market-driven boundary state**,  
+> and may be **observable rather than actively reachable**.
+
+This distinction is important for interpreting boundary behavior:
+
+- `WATCH` can be approached through user action or market movement
+- `BOUNDARY_APPROACHING` may require market-driven deterioration to be observed
 
 ### DEGRADED
 Observation is possible but data quality is reduced.
@@ -315,14 +334,14 @@ Future direction includes:
 ・Stronger trust propagation rules
 ・Richer boundary verification
 
-Verification Status
+## Verification Status
 
-・NO_POSITION: verified
-・STABLE: verified
-・WATCH: empirically observed
-・WATCH as market-driven boundary-near state: interpreted and implemented
-・BOUNDARY_APPROACHING: defined, not yet fully verified
-・REFUSAL / DEGRADED: verified through source-failure handling
+- `NO_POSITION`: verified  
+- `STABLE`: verified  
+- `WATCH`: empirically observed  
+- `WATCH` as market-driven boundary-near state: confirmed  
+- `BOUNDARY_APPROACHING`: semantically defined, not yet empirically observed  
+- `REFUSAL` / `DEGRADED`: verified through source-failure handling  
 
 Summary
 
@@ -336,7 +355,30 @@ Current focus:
 
 Formalizing trust, state origin, and protocol-boundary meaning across real market behavior.
 
+## Market-Driven Reachability
 
----
+Observer distinguishes between:
 
-次にやるときれいなのは、`board.py` の **HF表示を4桁化** して、`1.50` 表示なのに `WATCH` になる違和感を消すことです。
+- user-driven reachable states
+- market-driven reachable states
+
+Important observation:
+
+> Not all states defined in the model are directly reachable through user actions.
+
+In particular:
+
+- `WATCH` may be approached through both user actions and market dynamics
+- `BOUNDARY_APPROACHING` is expected to be primarily market-driven
+
+Under protocol constraints:
+
+- additional borrowing may be restricted before reaching deeper boundary regions
+- therefore, certain states may only be observed through post-position deterioration
+
+This leads to a key distinction:
+
+- Some states are **reachable**
+- Some states are **observable only**
+
+Observer explicitly preserves this distinction.

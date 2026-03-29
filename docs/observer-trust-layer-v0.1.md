@@ -379,3 +379,11 @@ Observer must never collapse:
 into a single layer.
 
 Preserving this separation is the foundation of reliable observation.
+
+### Source Instability Note
+
+During live observation, RPC access occasionally returned HTTP 429
+from `https://eth.llamarpc.com/`, causing REFUSAL state despite a valid live position.
+
+This does not invalidate the observer meaning model.
+It indicates a source-layer resilience issue to be addressed separately.
