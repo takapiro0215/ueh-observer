@@ -293,8 +293,28 @@ Mapping:
 
 Interpretation:
 
-> boundary-near states are typically reached after position creation,
-> not directly through borrowing
+> Boundary-near states are typically reached after position creation,
+> not directly through borrowing.
+
+Important distinction:
+
+- `WATCH` may be approached through both user actions and market dynamics
+- `BOUNDARY_APPROACHING` is expected to be primarily market-driven
+
+Under current protocol constraints:
+
+- additional borrowing may be restricted before reaching deeper boundary regions
+- therefore, certain states may only be observed through post-position deterioration
+
+This leads to a key distinction:
+
+- Some states are reachable
+- Some states are observable only
+
+In this model:
+
+- `WATCH` is considered both reachable and observable
+- `BOUNDARY_APPROACHING` is treated as primarily observable under current conditions
 
 ---
 
@@ -309,15 +329,13 @@ Mapping:
 ---
 
 ## Example (Observed)
+
 Health Factor : 1.4968 [VERIFIED] (RAW)
 Status : WATCH [CONSISTENT] (DERIVED)
 State Origin : MARKET [CONSISTENT] (DERIVED)
 Liq Distance : 49.68% [CONSISTENT] (DERIVED)
 
-
 ---
-
-## Display Policy
 
 ### VERIFIED / CONSISTENT
 Display normally.
